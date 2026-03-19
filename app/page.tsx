@@ -175,10 +175,6 @@ function botaoSucessoClass() {
   return "rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700";
 }
 
-function botaoSecundarioClass() {
-  return "rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100";
-}
-
 function cardClass() {
   return "rounded-3xl border border-slate-200 bg-white p-6 shadow-sm";
 }
@@ -192,13 +188,17 @@ function badgeTipo(tipo: TipoRegistro) {
 function resumirItensInterno(itens: ItemFormulario[]) {
   return itens
     .map((item) => {
-      const tamanho = item.tamanho ? ` (${item.tamanho})` : "";
-      return `${item.nome}${tamanho} x${item.quantidade}`;
+      const tamanho = item.tamanho ? `(${item.tamanho})` : "";
+      return `${item.nome}${tamanho}x${item.quantidade}`;
     })
     .join(" | ");
 }
 
-function montarItensDaFuncao(funcaoId: string, funcoes: FuncaoKit[], catalogo: ItemCatalogo[]): ItemFormulario[] {
+function montarItensDaFuncao(
+  funcaoId: string,
+  funcoes: FuncaoKit[],
+  catalogo: ItemCatalogo[]
+): ItemFormulario[] {
   const funcao = funcoes.find((f) => f.id === funcaoId);
   if (!funcao) return [];
 
@@ -231,18 +231,28 @@ function TabelaItens({
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="bg-slate-50">
-            <th className="border-b border-slate-200 p-3 text-left font-semibold text-slate-700">Peça</th>
-            <th className="border-b border-slate-200 p-3 text-left font-semibold text-slate-700">Tamanho</th>
-            <th className="border-b border-slate-200 p-3 text-center font-semibold text-slate-700">Qtd</th>
+            <th className="border-b border-slate-200 p-3 text-left font-semibold text-slate-700">
+              Peça
+            </th>
+            <th className="border-b border-slate-200 p-3 text-left font-semibold text-slate-700">
+              Tamanho
+            </th>
+            <th className="border-b border-slate-200 p-3 text-center font-semibold text-slate-700">
+              Qtd
+            </th>
             {mostrarAcoes && (
-              <th className="border-b border-slate-200 p-3 text-center font-semibold text-slate-700">Ações</th>
+              <th className="border-b border-slate-200 p-3 text-center font-semibold text-slate-700">
+                Ações
+              </th>
             )}
           </tr>
         </thead>
         <tbody>
           {itens.map((item, index) => (
             <tr key={`${item.id}-${index}`} className="hover:bg-slate-50/70">
-              <td className="border-b border-slate-100 p-3 text-slate-800">{item.nome}</td>
+              <td className="border-b border-slate-100 p-3 text-slate-800">
+                {item.nome}
+              </td>
               <td className="border-b border-slate-100 p-3">
                 {mostrarAcoes ? (
                   <input
@@ -262,7 +272,9 @@ function TabelaItens({
                     min={1}
                     className="w-20 rounded-lg border border-slate-200 px-2 py-1.5 text-center text-sm outline-none focus:border-slate-400"
                     value={item.quantidade}
-                    onChange={(e) => onAlterarQuantidade?.(index, Number(e.target.value))}
+                    onChange={(e) =>
+                      onAlterarQuantidade?.(index, Number(e.target.value))
+                    }
                   />
                 ) : (
                   <span className="text-slate-700">{item.quantidade}</span>
@@ -310,7 +322,9 @@ function ResumoLateral({
     <div className={`${cardClass()} space-y-4`}>
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-slate-900">Resumo</h3>
-        <span className={`rounded-full px-3 py-1 text-xs font-medium ${badgeTipo(tipo)}`}>{tipo}</span>
+        <span className={`rounded-full px-3 py-1 text-xs font-medium ${badgeTipo(tipo)}`}>
+          {tipo}
+        </span>
       </div>
 
       <div className="space-y-3 text-sm">
@@ -342,13 +356,13 @@ function ResumoLateral({
 
         {solicitante ? (
           <div className="rounded-2xl bg-slate-50 p-3">
-            <p className="text-slate-500">Solicitante</p>
+            <p className="text-slate-500">Responsável que solicitou</p>
             <p className="font-semibold text-slate-900">{solicitante}</p>
           </div>
         ) : null}
 
         <div className="rounded-2xl bg-slate-50 p-3">
-          <p className="text-slate-500">Responsável</p>
+          <p className="text-slate-500">Responsável pela retirada</p>
           <p className="font-semibold text-slate-900">{responsavel || "-"}</p>
         </div>
       </div>
@@ -362,9 +376,9 @@ function EtiquetaSaco({
   re,
   posto,
   responsavel,
+  solicitante,
   cargoLabel,
   itens,
-  solicitante,
   observacao,
 }: {
   tipo: TipoRegistro;
@@ -372,18 +386,20 @@ function EtiquetaSaco({
   re: string;
   posto: string;
   responsavel: string;
+  solicitante?: string;
   cargoLabel: string;
   itens: ItemFormulario[];
-  solicitante?: string;
   observacao?: string;
 }) {
   return (
-    <section className="print-etiqueta mx-auto max-w-[820px] rounded-xl border-2 border-black bg-white p-4">
+    <section className="print-etiqueta mx-auto max-w-[820px] rounded-xl border-2 border-black bg-white p-4 text-black">
       <div className="border-b-2 border-black pb-2">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold tracking-wide">UNIFORMES</h2>
-            <p className="text-[11px] uppercase tracking-wide">Identificação do saco / via do responsável</p>
+            <h2 className="text-xl font-bold tracking-wide">CONTROLE DE UNIFORME</h2>
+            <p className="text-[11px] uppercase tracking-wide">
+              Ficha de entrega / identificação do saco
+            </p>
           </div>
           <div className="text-right text-[11px]">
             <p className="font-semibold">{tipo}</p>
@@ -392,83 +408,91 @@ function EtiquetaSaco({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
-        <div className="rounded-md border-2 border-black px-3 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-gray-600">Colaborador</p>
-          <p className="text-base font-bold leading-tight">{nome || "________________"}</p>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="rounded-md border border-black px-3 py-2">
+          <p className="text-[10px] uppercase tracking-wide text-slate-600">Colaborador</p>
+          <p className="text-base font-bold leading-tight">
+            {nome || "________________"}
+          </p>
         </div>
 
-        <div className="rounded-md border-2 border-black px-3 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-gray-600">RE</p>
+        <div className="rounded-md border border-black px-3 py-2">
+          <p className="text-[10px] uppercase tracking-wide text-slate-600">RE</p>
           <p className="text-base font-bold leading-tight">{re || "________________"}</p>
         </div>
 
-        <div className="rounded-md border px-3 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-gray-600">Posto</p>
-          <p className="text-sm font-semibold leading-tight">{posto || "________________"}</p>
+        <div className="rounded-md border border-black px-3 py-2">
+          <p className="text-[10px] uppercase tracking-wide text-slate-600">Posto</p>
+          <p className="text-sm font-semibold leading-tight">
+            {posto || "________________"}
+          </p>
         </div>
 
-        <div className="rounded-md border px-3 py-2">
-          <p className="text-[10px] uppercase tracking-wide text-gray-600">Função</p>
-          <p className="text-sm font-semibold leading-tight">{cargoLabel}</p>
+        <div className="rounded-md border border-black px-3 py-2">
+          <p className="text-[10px] uppercase tracking-wide text-slate-600">Função</p>
+          <p className="text-sm font-semibold leading-tight">
+            {cargoLabel || "________________"}
+          </p>
         </div>
 
-        {solicitante ? (
-          <div className="rounded-md border px-3 py-2 md:col-span-2">
-            <p className="text-[10px] uppercase tracking-wide text-gray-600">Solicitante</p>
-            <p className="text-sm font-semibold leading-tight">{solicitante}</p>
-          </div>
-        ) : null}
-
-        <div className="rounded-md border px-3 py-2 md:col-span-2">
-          <p className="text-[10px] uppercase tracking-wide text-gray-600">Responsável pela retirada</p>
-          <p className="text-sm font-semibold leading-tight">{responsavel || "________________"}</p>
+        <div className="col-span-2 rounded-md border border-black px-3 py-2">
+          <p className="text-[10px] uppercase tracking-wide text-slate-600">
+            Responsável pela retirada
+          </p>
+          <p className="text-sm font-semibold leading-tight">
+            {responsavel || "________________"}
+          </p>
         </div>
 
-        {observacao ? (
-          <div className="rounded-md border px-3 py-2 md:col-span-2">
-            <p className="text-[10px] uppercase tracking-wide text-gray-600">Observação</p>
-            <p className="text-sm leading-tight">{observacao}</p>
-          </div>
-        ) : null}
+        <div className="col-span-2 rounded-md border border-black px-3 py-2">
+          <p className="text-[10px] uppercase tracking-wide text-slate-600">
+            Responsável que solicitou
+          </p>
+          <p className="text-sm font-semibold leading-tight">
+            {solicitante || "________________"}
+          </p>
+        </div>
       </div>
 
       <div className="mt-3">
-        <h3 className="mb-1 text-[11px] font-bold uppercase tracking-wide">Itens entregues</h3>
+        <h3 className="mb-1 text-[11px] font-bold uppercase tracking-wide">
+          Itens entregues
+        </h3>
 
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-[12px]">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-1.5 text-left">Peça</th>
-                <th className="border p-1.5 text-left">Tamanho</th>
-                <th className="border p-1.5 text-center">Qtd</th>
+        <table className="w-full border-collapse text-[11px]">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-black p-1.5 text-left">Peça</th>
+              <th className="border border-black p-1.5 text-left">Tamanho</th>
+              <th className="border border-black p-1.5 text-center">Qtd</th>
+            </tr>
+          </thead>
+          <tbody>
+            {itens.map((item, index) => (
+              <tr key={`${item.id}-${index}`}>
+                <td className="border border-black p-1.5 leading-tight">{item.nome}</td>
+                <td className="border border-black p-1.5 leading-tight">
+                  {item.tamanho || "-"}
+                </td>
+                <td className="border border-black p-1.5 text-center leading-tight">
+                  {item.quantidade}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {itens.map((item, index) => (
-                <tr key={`${item.id}-${index}`}>
-                  <td className="border p-1.5 leading-tight">{item.nome}</td>
-                  <td className="border p-1.5 leading-tight">{item.tamanho || "-"}</td>
-                  <td className="border p-1.5 text-center leading-tight">{item.quantidade}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {tipo === "Troca" ? (
-        <div className="mt-3 rounded-md border border-black p-2 text-[11px]">
-          Em caso de troca, as peças antigas devem ser devolvidas em até 30 dias, conforme controle interno do setor.
+      {observacao ? (
+        <div className="mt-3 rounded-md border border-black px-3 py-2 text-[11px]">
+          <p className="font-semibold">Observação:</p>
+          <p>{observacao}</p>
         </div>
       ) : null}
 
-      <div className="mt-5">
-        <div>
-          <div className="mb-1 h-[32px] border-b border-black" />
-          <p className="text-[11px]">Assinatura de quem retirou</p>
-        </div>
+      <div className="mt-4">
+        <div className="mb-1 h-[28px] border-b border-black" />
+        <p className="text-[11px]">Assinatura do responsável pela retirada</p>
       </div>
     </section>
   );
@@ -477,24 +501,27 @@ function EtiquetaSaco({
 function TabelaControleInterno({ registros }: { registros: RegistroInterno[] }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200">
-      <table className="w-full border-collapse text-[11px] md:text-xs">
+      <table className="w-full border-collapse text-[10px] md:text-[11px]">
         <thead>
           <tr className="bg-slate-50">
-            <th className="w-[8%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Data</th>
-            <th className="w-[8%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Tipo</th>
-            <th className="w-[12%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Colaborador</th>
-            <th className="w-[6%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">RE</th>
-            <th className="w-[10%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Posto</th>
-            <th className="w-[14%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Função</th>
-            <th className="w-[24%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Peças</th>
-            <th className="w-[10%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Responsável</th>
-            <th className="w-[8%] border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Assinatura</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Data</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Tipo</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Colaborador</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">RE</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Posto</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Função</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Peças</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Resp. retirada</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Resp. solicitou</th>
+            <th className="border-b border-slate-200 p-2 text-left font-semibold text-slate-700">Assinatura</th>
           </tr>
         </thead>
         <tbody>
           {registros.length === 0 ? (
             <tr>
-              <td colSpan={9} className="p-4 text-center text-slate-500">Nenhum registro salvo ainda.</td>
+              <td colSpan={10} className="p-4 text-center text-slate-500">
+                Nenhum registro salvo ainda.
+              </td>
             </tr>
           ) : (
             registros.map((registro) => (
@@ -505,14 +532,21 @@ function TabelaControleInterno({ registros }: { registros: RegistroInterno[] }) 
                     {registro.tipo}
                   </span>
                 </td>
-                <td className="border-b border-slate-100 p-2 align-top font-medium text-slate-900">{registro.colaborador}</td>
+                <td className="border-b border-slate-100 p-2 align-top font-medium text-slate-900">
+                  {registro.colaborador}
+                </td>
                 <td className="border-b border-slate-100 p-2 align-top">{registro.re}</td>
                 <td className="border-b border-slate-100 p-2 align-top">{registro.posto}</td>
                 <td className="border-b border-slate-100 p-2 align-top">{registro.cargo}</td>
-                <td className="border-b border-slate-100 p-2 align-top leading-4">{resumirItensInterno(registro.itens)}</td>
+                <td className="border-b border-slate-100 p-2 align-top leading-4">
+                  {resumirItensInterno(registro.itens)}
+                </td>
                 <td className="border-b border-slate-100 p-2 align-top">{registro.responsavel}</td>
                 <td className="border-b border-slate-100 p-2 align-top">
-                  <div className="mt-5 w-full border-b border-black" />
+                  {registro.solicitante || "-"}
+                </td>
+                <td className="border-b border-slate-100 p-2 align-top">
+                  <div className="mt-4 w-full border-b border-black" />
                 </td>
               </tr>
             ))
@@ -538,6 +572,7 @@ function AbaAdmissao({
   const [re, setRe] = useState("");
   const [posto, setPosto] = useState("");
   const [responsavel, setResponsavel] = useState("");
+  const [solicitante, setSolicitante] = useState("");
   const [funcaoId, setFuncaoId] = useState(funcoes[0]?.id || "");
   const [itemExtraId, setItemExtraId] = useState("");
   const [itens, setItens] = useState<ItemFormulario[]>([]);
@@ -593,6 +628,7 @@ function AbaAdmissao({
       posto,
       cargo: funcaoLabel,
       responsavel,
+      solicitante,
       itens,
     };
   }
@@ -618,8 +654,15 @@ function AbaAdmissao({
           .no-print { display: none !important; }
           .print-etiqueta { display: none !important; }
           .somente-etiqueta .print-etiqueta { display: block !important; }
-          .print-etiqueta { max-width: 820px !important; padding: 16px !important; border-width: 1.5px !important; }
-          .print-etiqueta table { font-size: 12px !important; }
+          .print-etiqueta {
+            max-width: 820px !important;
+            padding: 12px !important;
+            border-width: 1.5px !important;
+            box-shadow: none !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          .print-etiqueta table { font-size: 11px !important; }
           .print-etiqueta th, .print-etiqueta td { padding: 4px !important; }
         }
       `}</style>
@@ -657,7 +700,17 @@ function AbaAdmissao({
                 </select>
               </div>
 
-              <div className="space-y-1 md:col-span-2">
+              <div className="space-y-1">
+                <label className={campoLabelClass()}>Responsável que solicitou</label>
+                <input
+                  className={campoInputClass()}
+                  value={solicitante}
+                  onChange={(e) => setSolicitante(e.target.value)}
+                  placeholder="Quem solicitou os uniformes"
+                />
+              </div>
+
+              <div className="space-y-1">
                 <label className={campoLabelClass()}>Função</label>
                 <select className={campoInputClass()} value={funcaoId} onChange={(e) => setFuncaoId(e.target.value)}>
                   {funcoes.map((funcao) => (
@@ -702,7 +755,7 @@ function AbaAdmissao({
                 </button>
 
                 <button onClick={imprimirEtiqueta} className={botaoPrimarioClass()}>
-                  Imprimir etiqueta do saco
+                  Imprimir folha do uniforme
                 </button>
               </div>
             </div>
@@ -716,6 +769,7 @@ function AbaAdmissao({
             responsavel={responsavel}
             cargo={funcaoLabel}
             totalItens={totalItens}
+            solicitante={solicitante}
           />
         </div>
 
@@ -725,6 +779,7 @@ function AbaAdmissao({
           re={re}
           posto={posto}
           responsavel={responsavel}
+          solicitante={solicitante}
           cargoLabel={funcaoLabel}
           itens={itens}
         />
@@ -793,7 +848,8 @@ function AbaTroca({
       cargo: "Troca de uniforme",
       responsavel,
       solicitante,
-      observacao: "As peças antigas devem ser devolvidas em até 30 dias, conforme controle interno do setor.",
+      observacao:
+        "As peças antigas devem ser devolvidas em até 30 dias, conforme controle interno do setor.",
       itens,
     };
   }
@@ -819,8 +875,15 @@ function AbaTroca({
           .no-print { display: none !important; }
           .print-etiqueta { display: none !important; }
           .somente-etiqueta .print-etiqueta { display: block !important; }
-          .print-etiqueta { max-width: 820px !important; padding: 16px !important; border-width: 1.5px !important; }
-          .print-etiqueta table { font-size: 12px !important; }
+          .print-etiqueta {
+            max-width: 820px !important;
+            padding: 12px !important;
+            border-width: 1.5px !important;
+            box-shadow: none !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          .print-etiqueta table { font-size: 11px !important; }
           .print-etiqueta th, .print-etiqueta td { padding: 4px !important; }
         }
       `}</style>
@@ -847,7 +910,7 @@ function AbaTroca({
               </div>
 
               <div className="space-y-1">
-                <label className={campoLabelClass()}>Solicitante</label>
+                <label className={campoLabelClass()}>Responsável que solicitou</label>
                 <input className={campoInputClass()} value={solicitante} onChange={(e) => setSolicitante(e.target.value)} placeholder="Quem solicitou a troca" />
               </div>
 
@@ -904,7 +967,7 @@ function AbaTroca({
                 </button>
 
                 <button onClick={imprimirEtiqueta} className={botaoPrimarioClass()}>
-                  Imprimir etiqueta da troca
+                  Imprimir folha do uniforme
                 </button>
               </div>
             </div>
@@ -928,9 +991,9 @@ function AbaTroca({
           re={re}
           posto={posto}
           responsavel={responsavel}
+          solicitante={solicitante}
           cargoLabel="Troca de uniforme"
           itens={itens}
-          solicitante={solicitante}
           observacao="As peças antigas devem ser devolvidas em até 30 dias, conforme controle interno do setor."
         />
       </div>
@@ -963,10 +1026,17 @@ function AbaControleInterno({
           .no-print { display: none !important; }
           .print-controle { display: none !important; }
           .somente-controle .print-controle { display: block !important; }
-          .print-controle { max-width: 100% !important; padding: 12px !important; border-width: 1px !important; }
-          .print-controle table { font-size: 11px !important; }
+          .print-controle {
+            max-width: 100% !important;
+            padding: 12px !important;
+            border-width: 1px !important;
+          }
+          .print-controle table { font-size: 10px !important; }
           .print-controle th, .print-controle td { padding: 4px !important; }
-          .print-controle tr { page-break-inside: avoid; break-inside: avoid; }
+          .print-controle tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
         }
       `}</style>
 
@@ -975,7 +1045,9 @@ function AbaControleInterno({
           <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Controle Interno</h2>
-              <p className="text-sm text-slate-500">Histórico consolidado de admissões e trocas</p>
+              <p className="text-sm text-slate-500">
+                Histórico consolidado de admissões e trocas
+              </p>
             </div>
 
             <button onClick={imprimirControleInterno} className={botaoPrimarioClass()}>
@@ -1049,6 +1121,7 @@ function AbaCadastros({
 
   function adicionarPecaCatalogo() {
     if (!novaPecaNome.trim()) return;
+
     const id = novaPecaNome
       .toLowerCase()
       .normalize("NFD")
@@ -1134,7 +1207,9 @@ function AbaCadastros({
           return {
             ...funcao,
             itens: funcao.itens.map((item) =>
-              item.id === pecaKitId ? { ...item, quantidade: item.quantidade + pecaKitQtd } : item
+              item.id === pecaKitId
+                ? { ...item, quantidade: item.quantidade + pecaKitQtd }
+                : item
             ),
           };
         }
