@@ -635,7 +635,7 @@ function ControleInternoPrint({
 
             <section className="doc-signature">
               <div className="doc-sign-line" />
-              <p>Assinatura do colaborador</p>
+              <p>Assinatura do responsável pela retirada</p>
             </section>
           </article>
         ))
