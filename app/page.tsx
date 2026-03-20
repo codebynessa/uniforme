@@ -578,7 +578,7 @@ function ControleInternoPrint({
         </div>
       ) : (
         registros.map((registro, index) => (
-          <article key={registro.id} className="doc-ficha">
+          <article key={registro.id} className="doc-ficha doc-ficha-dupla">
             <header className="doc-header">
               <div className="doc-header-left">
                 <h2>CONTROLE DE ENTREGA DE UNIFORMES</h2>
@@ -607,7 +607,7 @@ function ControleInternoPrint({
               <CampoDocumento
                 label="Colaborador"
                 value={registro.colaborador}
-                className="col-span-2"
+                className="doc-col-span-2"
               />
               <CampoDocumento label="Posto" value={registro.posto} />
               <CampoDocumento label="Função" value={registro.cargo} />
@@ -637,10 +637,6 @@ function ControleInternoPrint({
               <div className="doc-sign-line" />
               <p>Assinatura do colaborador</p>
             </section>
-
-            <footer className="doc-footer">
-              Documento gerado pelo sistema de controle de uniformes
-            </footer>
           </article>
         ))
       )}
@@ -1251,18 +1247,18 @@ function AbaControleInterno({
 
       <section className="print-controle hidden bg-white">
         <div className="mx-auto w-full max-w-[190mm] text-black">
-          <div className="mb-5 border-b border-black pb-3">
+          <div className="mb-4 border-b border-black pb-2">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <h1 className="text-xl font-bold tracking-wide">
+                <h1 className="text-lg font-bold tracking-wide">
                   CONTROLE INTERNO DE UNIFORMES
                 </h1>
-                <p className="text-[11px] uppercase tracking-[0.14em] text-slate-600">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-slate-600">
                   Documento para arquivamento em fichário
                 </p>
               </div>
 
-              <div className="text-right text-[11px]">
+              <div className="text-right text-[10px]">
                 <p className="font-semibold">Data da impressão</p>
                 <p>{new Date().toLocaleDateString("pt-BR")}</p>
               </div>
@@ -1440,7 +1436,10 @@ function AbaCadastros({
     setFuncoes((atual) =>
       atual.map((funcao) =>
         funcao.id === funcaoId
-          ? { ...funcao, itens: funcao.itens.filter((item) => item.id !== itemId) }
+          ? {
+              ...funcao,
+              itens: funcao.itens.filter((item) => item.id !== itemId),
+            }
           : funcao
       )
     );
@@ -1854,10 +1853,16 @@ export default function Home() {
             color: #000;
           }
 
-          .doc-ficha {
+          .doc-ficha-dupla {
+            height: 128mm;
             break-inside: avoid;
             page-break-inside: avoid;
-            margin-bottom: 10mm;
+            overflow: hidden;
+            margin-bottom: 4mm;
+          }
+
+          .doc-ficha-dupla:nth-child(2n) {
+            margin-bottom: 0;
           }
         }
 
@@ -1870,94 +1875,100 @@ export default function Home() {
 
         .doc-ficha {
           border: 1px solid #000;
-          padding: 14px;
+          padding: 10px;
           background: #fff;
+          box-sizing: border-box;
+        }
+
+        .doc-ficha-dupla {
+          min-height: 128mm;
         }
 
         .doc-header {
           display: flex;
           justify-content: space-between;
-          border-bottom: 2px solid #000;
-          padding-bottom: 8px;
-          margin-bottom: 12px;
-          gap: 12px;
+          border-bottom: 1.5px solid #000;
+          padding-bottom: 6px;
+          margin-bottom: 8px;
+          gap: 10px;
         }
 
         .doc-header-left h2 {
-          font-size: 15px;
-          font-weight: bold;
+          font-size: 13px;
+          font-weight: 700;
           letter-spacing: 0.04em;
-          line-height: 1.25;
+          line-height: 1.2;
         }
 
         .doc-subtitle {
-          font-size: 10px;
+          font-size: 9px;
           text-transform: uppercase;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.1em;
           margin-top: 2px;
         }
 
         .doc-header-right {
           display: flex;
-          gap: 12px;
+          gap: 10px;
           flex-shrink: 0;
         }
 
         .doc-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 8px;
+          gap: 6px;
+        }
+
+        .doc-col-span-2 {
+          grid-column: span 2;
         }
 
         .doc-section {
-          margin-top: 10px;
+          margin-top: 8px;
         }
 
         .doc-box {
           border: 1px solid #000;
-          padding: 8px;
-          min-height: 55px;
+          padding: 6px 8px;
+          min-height: 44px;
           background: #fff;
+          box-sizing: border-box;
         }
 
         .doc-label {
-          font-size: 9px;
-          font-weight: bold;
+          display: block;
+          font-size: 8px;
+          font-weight: 700;
           text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 3px;
         }
 
         .doc-value {
-          font-size: 12px;
-          line-height: 1.4;
+          font-size: 11px;
+          line-height: 1.25;
           word-break: break-word;
         }
 
         .destaque {
-          font-weight: bold;
+          font-weight: 700;
         }
 
         .doc-signature {
-          margin-top: 26px;
+          margin-top: 14px;
           text-align: center;
         }
 
         .doc-sign-line {
-          width: 70%;
-          height: 60px;
+          width: 68%;
+          height: 34px;
           border-bottom: 1px solid #000;
-          margin: auto;
+          margin: 0 auto;
         }
 
         .doc-signature p {
-          font-size: 11px;
-          margin-top: 6px;
-        }
-
-        .doc-footer {
-          margin-top: 14px;
-          font-size: 9px;
-          text-align: center;
-          opacity: 0.7;
+          font-size: 10px;
+          margin-top: 4px;
         }
       `}</style>
 
