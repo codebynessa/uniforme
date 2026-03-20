@@ -237,10 +237,10 @@ function montarItensDaFuncao(
 function resumirItensInterno(itens: ItemFormulario[]) {
   return itens
     .map((item) => {
-      const tamanho = item.tamanho ? `(${item.tamanho})` : "";
-      return `${item.nome}${tamanho}x${item.quantidade}`;
+      const tamanho = item.tamanho ? ` (${item.tamanho})` : "";
+      return `${item.nome}${tamanho} x${item.quantidade}`;
     })
-    .join(" | ");
+    .join(" • ");
 }
 
 function TabelaItens({
@@ -347,7 +347,7 @@ function ResumoLateral({
   totalItens: number;
 }) {
   return (
-    <div className={`${cardClass()} space-y-4`}>
+    <div className={`${cardClass()} space-y-4 no-print`}>
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-slate-900">Resumo</h3>
         <span
@@ -548,88 +548,100 @@ function EtiquetaSaco({
   );
 }
 
+function CampoDocumento({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
+  return (
+    <div className={`doc-box ${className}`}>
+      <span className="doc-label">{label}</span>
+      <p className="doc-value">{value || "-"}</p>
+    </div>
+  );
+}
+
 function ControleInternoPrint({
   registros,
 }: {
   registros: RegistroInterno[];
 }) {
   return (
-    <div className="space-y-3">
+    <div className="print-doc">
       {registros.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center text-slate-500">
+        <div className="rounded-2xl border border-slate-300 bg-white p-4 text-center text-slate-500">
           Nenhum registro salvo ainda.
         </div>
       ) : (
-        registros.map((registro) => (
-          <div
-            key={registro.id}
-            className="break-inside-avoid rounded-2xl border border-slate-300 bg-white p-3"
-          >
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
-              <div>
-                <span className="font-semibold text-slate-700">Data:</span>{" "}
-                {registro.data}
-              </div>
-              <div>
-                <span className="font-semibold text-slate-700">Tipo:</span>{" "}
-                <span
-                  className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${badgeClass(
-                    registro.tipo
-                  )}`}
-                >
-                  {registro.tipo}
-                </span>
+        registros.map((registro, index) => (
+          <article key={registro.id} className="doc-ficha">
+            <header className="doc-header">
+              <div className="doc-header-left">
+                <h2>CONTROLE DE ENTREGA DE UNIFORMES</h2>
+                <p className="doc-subtitle">
+                  Documento interno para arquivamento
+                </p>
               </div>
 
-              <div className="col-span-2">
-                <span className="font-semibold text-slate-700">
-                  Colaborador:
-                </span>{" "}
-                {registro.colaborador}
+              <div className="doc-header-right">
+                <div>
+                  <span className="doc-label">Nº Registro</span>
+                  <p className="doc-value">
+                    {String(registros.length - index).padStart(4, "0")}
+                  </p>
+                </div>
+                <div>
+                  <span className="doc-label">Data</span>
+                  <p className="doc-value">{registro.data}</p>
+                </div>
               </div>
+            </header>
 
-              <div>
-                <span className="font-semibold text-slate-700">RE:</span>{" "}
-                {registro.re}
+            <section className="doc-grid">
+              <CampoDocumento label="Tipo" value={registro.tipo} />
+              <CampoDocumento label="RE" value={registro.re} />
+              <CampoDocumento
+                label="Colaborador"
+                value={registro.colaborador}
+                className="col-span-2"
+              />
+              <CampoDocumento label="Posto" value={registro.posto} />
+              <CampoDocumento label="Função" value={registro.cargo} />
+            </section>
+
+            <section className="doc-section">
+              <div className="doc-box">
+                <span className="doc-label">Peças entregues</span>
+                <p className="doc-value destaque">
+                  {resumirItensInterno(registro.itens)}
+                </p>
               </div>
+            </section>
 
-              <div>
-                <span className="font-semibold text-slate-700">Posto:</span>{" "}
-                {registro.posto}
-              </div>
+            <section className="doc-grid">
+              <CampoDocumento
+                label="Responsável pela retirada"
+                value={registro.responsavel}
+              />
+              <CampoDocumento
+                label="Responsável que solicitou"
+                value={registro.solicitante || "-"}
+              />
+            </section>
 
-              <div className="col-span-2">
-                <span className="font-semibold text-slate-700">Função:</span>{" "}
-                {registro.cargo}
-              </div>
+            <section className="doc-signature">
+              <div className="doc-sign-line" />
+              <p>Assinatura do colaborador</p>
+            </section>
 
-              <div className="col-span-2">
-                <span className="font-semibold text-slate-700">Peças:</span>{" "}
-                {resumirItensInterno(registro.itens)}
-              </div>
-
-              <div>
-                <span className="font-semibold text-slate-700">
-                  Resp. retirada:
-                </span>{" "}
-                {registro.responsavel}
-              </div>
-
-              <div>
-                <span className="font-semibold text-slate-700">
-                  Resp. solicitou:
-                </span>{" "}
-                {registro.solicitante || "-"}
-              </div>
-            </div>
-
-            <div className="mt-5">
-              <div className="h-[42px] border-b border-black" />
-              <p className="mt-1 text-[11px] text-slate-700">
-                Assinatura de quem retirou / recebeu
-              </p>
-            </div>
-          </div>
+            <footer className="doc-footer">
+              Documento gerado pelo sistema de controle de uniformes
+            </footer>
+          </article>
         ))
       )}
     </div>
@@ -732,206 +744,166 @@ function AbaAdmissao({
     setTimeout(() => {
       window.print();
       setModoImpressao("nenhum");
-    }, 100);
+    }, 150);
   }
 
   return (
-    <>
-      <style jsx global>{`
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 8mm;
-          }
+    <div className={modoImpressao === "etiqueta" ? "somente-etiqueta" : ""}>
+      <div className="grid gap-6 xl:grid-cols-[1.6fr_0.8fr]">
+        <div className={`${cardClass()} no-print`}>
+          <h2 className="mb-5 text-xl font-semibold text-slate-900">
+            Admissão
+          </h2>
 
-          html,
-          body {
-            background: white !important;
-          }
-
-          body * {
-            visibility: hidden;
-          }
-
-          .print-etiqueta,
-          .print-etiqueta * {
-            visibility: visible !important;
-          }
-
-          .print-etiqueta {
-            display: block !important;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100% !important;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-        }
-      `}</style>
-
-      <div className={modoImpressao === "etiqueta" ? "somente-etiqueta" : ""}>
-        <div className="grid gap-6 xl:grid-cols-[1.6fr_0.8fr]">
-          <div className={cardClass()}>
-            <h2 className="mb-5 text-xl font-semibold text-slate-900">
-              Admissão
-            </h2>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <label className={labelClass()}>Nome do colaborador</label>
-                <input
-                  className={fieldClass()}
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Digite o nome"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className={labelClass()}>RE</label>
-                <input
-                  className={fieldClass()}
-                  value={re}
-                  onChange={(e) => setRe(e.target.value)}
-                  placeholder="Digite o RE"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className={labelClass()}>Posto do colaborador</label>
-                <input
-                  className={fieldClass()}
-                  value={posto}
-                  onChange={(e) => setPosto(e.target.value)}
-                  placeholder="Digite o posto"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className={labelClass()}>
-                  Responsável pela retirada
-                </label>
-                <select
-                  className={fieldClass()}
-                  value={responsavel}
-                  onChange={(e) => setResponsavel(e.target.value)}
-                >
-                  <option value="">Selecione</option>
-                  {responsaveis.map((item) => (
-                    <option
-                      key={item.id}
-                      value={`${item.nome} - RE ${item.re}`}
-                    >
-                      {item.nome} - RE {item.re}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className={labelClass()}>
-                  Responsável que solicitou
-                </label>
-                <input
-                  className={fieldClass()}
-                  value={solicitante}
-                  onChange={(e) => setSolicitante(e.target.value)}
-                  placeholder="Quem solicitou os uniformes"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className={labelClass()}>Função</label>
-                <select
-                  className={fieldClass()}
-                  value={funcaoId}
-                  onChange={(e) => setFuncaoId(e.target.value)}
-                >
-                  {funcoes.map((funcao) => (
-                    <option key={funcao.id} value={funcao.id}>
-                      {funcao.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className={labelClass()}>Nome do colaborador</label>
+              <input
+                className={fieldClass()}
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Digite o nome"
+              />
             </div>
 
-            <div className="mt-6 space-y-4">
-              <TabelaItens
-                itens={itens}
-                onAlterarTamanho={atualizarTamanho}
-                onAlterarQuantidade={atualizarQuantidade}
-                onRemover={removerItem}
+            <div className="space-y-1">
+              <label className={labelClass()}>RE</label>
+              <input
+                className={fieldClass()}
+                value={re}
+                onChange={(e) => setRe(e.target.value)}
+                placeholder="Digite o RE"
               />
+            </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <h3 className="mb-3 font-medium text-slate-900">
-                  Adicionar item extra
-                </h3>
+            <div className="space-y-1">
+              <label className={labelClass()}>Posto do colaborador</label>
+              <input
+                className={fieldClass()}
+                value={posto}
+                onChange={(e) => setPosto(e.target.value)}
+                placeholder="Digite o posto"
+              />
+            </div>
 
-                <div className="flex flex-col gap-3 md:flex-row">
-                  <select
-                    className={fieldClass()}
-                    value={itemExtraId}
-                    onChange={(e) => setItemExtraId(e.target.value)}
-                  >
-                    <option value="">Selecione uma peça</option>
-                    {catalogo.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.nome}
-                      </option>
-                    ))}
-                  </select>
+            <div className="space-y-1">
+              <label className={labelClass()}>
+                Responsável pela retirada
+              </label>
+              <select
+                className={fieldClass()}
+                value={responsavel}
+                onChange={(e) => setResponsavel(e.target.value)}
+              >
+                <option value="">Selecione</option>
+                {responsaveis.map((item) => (
+                  <option key={item.id} value={`${item.nome} - RE ${item.re}`}>
+                    {item.nome} - RE {item.re}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                  <button
-                    type="button"
-                    onClick={adicionarItemExtra}
-                    className={buttonPrimary()}
-                  >
-                    Adicionar
-                  </button>
-                </div>
-              </div>
+            <div className="space-y-1">
+              <label className={labelClass()}>
+                Responsável que solicitou
+              </label>
+              <input
+                className={fieldClass()}
+                value={solicitante}
+                onChange={(e) => setSolicitante(e.target.value)}
+                placeholder="Quem solicitou os uniformes"
+              />
+            </div>
 
-              <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
-                <button onClick={salvarEntrega} className={buttonSuccess()}>
-                  Salvar no controle interno
-                </button>
-
-                <button onClick={imprimirEtiqueta} className={buttonPrimary()}>
-                  Imprimir folha do uniforme
-                </button>
-              </div>
+            <div className="space-y-1">
+              <label className={labelClass()}>Função</label>
+              <select
+                className={fieldClass()}
+                value={funcaoId}
+                onChange={(e) => setFuncaoId(e.target.value)}
+              >
+                {funcoes.map((funcao) => (
+                  <option key={funcao.id} value={funcao.id}>
+                    {funcao.nome}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <ResumoLateral
-            tipo="Admissão"
-            nome={nome}
-            re={re}
-            posto={posto}
-            cargo={funcaoLabel}
-            responsavel={responsavel}
-            solicitante={solicitante}
-            totalItens={totalItens}
-          />
+          <div className="mt-6 space-y-4">
+            <TabelaItens
+              itens={itens}
+              onAlterarTamanho={atualizarTamanho}
+              onAlterarQuantidade={atualizarQuantidade}
+              onRemover={removerItem}
+            />
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <h3 className="mb-3 font-medium text-slate-900">
+                Adicionar item extra
+              </h3>
+
+              <div className="flex flex-col gap-3 md:flex-row">
+                <select
+                  className={fieldClass()}
+                  value={itemExtraId}
+                  onChange={(e) => setItemExtraId(e.target.value)}
+                >
+                  <option value="">Selecione uma peça</option>
+                  {catalogo.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.nome}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={adicionarItemExtra}
+                  className={buttonPrimary()}
+                >
+                  Adicionar
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
+              <button onClick={salvarEntrega} className={buttonSuccess()}>
+                Salvar no controle interno
+              </button>
+
+              <button onClick={imprimirEtiqueta} className={buttonPrimary()}>
+                Imprimir folha do uniforme
+              </button>
+            </div>
+          </div>
         </div>
 
-        <EtiquetaSaco
+        <ResumoLateral
           tipo="Admissão"
           nome={nome}
           re={re}
           posto={posto}
+          cargo={funcaoLabel}
           responsavel={responsavel}
           solicitante={solicitante}
-          cargoLabel={funcaoLabel}
-          itens={itens}
+          totalItens={totalItens}
         />
       </div>
-    </>
+
+      <EtiquetaSaco
+        tipo="Admissão"
+        nome={nome}
+        re={re}
+        posto={posto}
+        responsavel={responsavel}
+        solicitante={solicitante}
+        cargoLabel={funcaoLabel}
+        itens={itens}
+      />
+    </div>
   );
 }
 
@@ -1021,198 +993,158 @@ function AbaTroca({
     setTimeout(() => {
       window.print();
       setModoImpressao("nenhum");
-    }, 100);
+    }, 150);
   }
 
   return (
-    <>
-      <style jsx global>{`
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 8mm;
-          }
+    <div className={modoImpressao === "etiqueta" ? "somente-etiqueta" : ""}>
+      <div className="grid gap-6 xl:grid-cols-[1.6fr_0.8fr]">
+        <div className={`${cardClass()} no-print`}>
+          <h2 className="mb-5 text-xl font-semibold text-slate-900">Troca</h2>
 
-          html,
-          body {
-            background: white !important;
-          }
-
-          body * {
-            visibility: hidden;
-          }
-
-          .print-etiqueta,
-          .print-etiqueta * {
-            visibility: visible !important;
-          }
-
-          .print-etiqueta {
-            display: block !important;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100% !important;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-        }
-      `}</style>
-
-      <div className={modoImpressao === "etiqueta" ? "somente-etiqueta" : ""}>
-        <div className="grid gap-6 xl:grid-cols-[1.6fr_0.8fr]">
-          <div className={cardClass()}>
-            <h2 className="mb-5 text-xl font-semibold text-slate-900">Troca</h2>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <label className={labelClass()}>Nome do colaborador</label>
-                <input
-                  className={fieldClass()}
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Digite o nome"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className={labelClass()}>RE</label>
-                <input
-                  className={fieldClass()}
-                  value={re}
-                  onChange={(e) => setRe(e.target.value)}
-                  placeholder="Digite o RE"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className={labelClass()}>Posto do colaborador</label>
-                <input
-                  className={fieldClass()}
-                  value={posto}
-                  onChange={(e) => setPosto(e.target.value)}
-                  placeholder="Digite o posto"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className={labelClass()}>
-                  Responsável que solicitou
-                </label>
-                <input
-                  className={fieldClass()}
-                  value={solicitante}
-                  onChange={(e) => setSolicitante(e.target.value)}
-                  placeholder="Quem solicitou a troca"
-                />
-              </div>
-
-              <div className="space-y-1 md:col-span-2">
-                <label className={labelClass()}>
-                  Responsável pela retirada
-                </label>
-                <select
-                  className={fieldClass()}
-                  value={responsavel}
-                  onChange={(e) => setResponsavel(e.target.value)}
-                >
-                  <option value="">Selecione</option>
-                  {responsaveis.map((item) => (
-                    <option
-                      key={item.id}
-                      value={`${item.nome} - RE ${item.re}`}
-                    >
-                      {item.nome} - RE {item.re}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <label className={labelClass()}>Nome do colaborador</label>
+              <input
+                className={fieldClass()}
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Digite o nome"
+              />
             </div>
 
-            <div className="mt-6 space-y-4">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <h3 className="mb-3 font-medium text-slate-900">
-                  Adicionar peça da troca
-                </h3>
-
-                <div className="flex flex-col gap-3 md:flex-row">
-                  <select
-                    className={fieldClass()}
-                    value={itemId}
-                    onChange={(e) => setItemId(e.target.value)}
-                  >
-                    <option value="">Selecione uma peça</option>
-                    {catalogo.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.nome}
-                      </option>
-                    ))}
-                  </select>
-
-                  <button
-                    type="button"
-                    onClick={adicionarPecaTroca}
-                    className={buttonPrimary()}
-                  >
-                    Adicionar
-                  </button>
-                </div>
-              </div>
-
-              <TabelaItens
-                itens={itens}
-                onAlterarTamanho={atualizarTamanho}
-                onAlterarQuantidade={atualizarQuantidade}
-                onRemover={removerItem}
+            <div className="space-y-1">
+              <label className={labelClass()}>RE</label>
+              <input
+                className={fieldClass()}
+                value={re}
+                onChange={(e) => setRe(e.target.value)}
+                placeholder="Digite o RE"
               />
+            </div>
 
-              <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-                <p className="font-semibold">Observação de troca</p>
-                <p className="mt-1">
-                  As peças antigas devem ser devolvidas em até 30 dias,
-                  conforme controle interno do setor.
-                </p>
-              </div>
+            <div className="space-y-1">
+              <label className={labelClass()}>Posto do colaborador</label>
+              <input
+                className={fieldClass()}
+                value={posto}
+                onChange={(e) => setPosto(e.target.value)}
+                placeholder="Digite o posto"
+              />
+            </div>
 
-              <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
-                <button onClick={salvarTroca} className={buttonSuccess()}>
-                  Salvar no controle interno
-                </button>
+            <div className="space-y-1">
+              <label className={labelClass()}>
+                Responsável que solicitou
+              </label>
+              <input
+                className={fieldClass()}
+                value={solicitante}
+                onChange={(e) => setSolicitante(e.target.value)}
+                placeholder="Quem solicitou a troca"
+              />
+            </div>
 
-                <button onClick={imprimirEtiqueta} className={buttonPrimary()}>
-                  Imprimir folha do uniforme
-                </button>
-              </div>
+            <div className="space-y-1 md:col-span-2">
+              <label className={labelClass()}>
+                Responsável pela retirada
+              </label>
+              <select
+                className={fieldClass()}
+                value={responsavel}
+                onChange={(e) => setResponsavel(e.target.value)}
+              >
+                <option value="">Selecione</option>
+                {responsaveis.map((item) => (
+                  <option key={item.id} value={`${item.nome} - RE ${item.re}`}>
+                    {item.nome} - RE {item.re}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <ResumoLateral
-            tipo="Troca"
-            nome={nome}
-            re={re}
-            posto={posto}
-            cargo="Troca de uniforme"
-            responsavel={responsavel}
-            solicitante={solicitante}
-            totalItens={totalItens}
-          />
+          <div className="mt-6 space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <h3 className="mb-3 font-medium text-slate-900">
+                Adicionar peça da troca
+              </h3>
+
+              <div className="flex flex-col gap-3 md:flex-row">
+                <select
+                  className={fieldClass()}
+                  value={itemId}
+                  onChange={(e) => setItemId(e.target.value)}
+                >
+                  <option value="">Selecione uma peça</option>
+                  {catalogo.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.nome}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={adicionarPecaTroca}
+                  className={buttonPrimary()}
+                >
+                  Adicionar
+                </button>
+              </div>
+            </div>
+
+            <TabelaItens
+              itens={itens}
+              onAlterarTamanho={atualizarTamanho}
+              onAlterarQuantidade={atualizarQuantidade}
+              onRemover={removerItem}
+            />
+
+            <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+              <p className="font-semibold">Observação de troca</p>
+              <p className="mt-1">
+                As peças antigas devem ser devolvidas em até 30 dias, conforme
+                controle interno do setor.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
+              <button onClick={salvarTroca} className={buttonSuccess()}>
+                Salvar no controle interno
+              </button>
+
+              <button onClick={imprimirEtiqueta} className={buttonPrimary()}>
+                Imprimir folha do uniforme
+              </button>
+            </div>
+          </div>
         </div>
 
-        <EtiquetaSaco
+        <ResumoLateral
           tipo="Troca"
           nome={nome}
           re={re}
           posto={posto}
+          cargo="Troca de uniforme"
           responsavel={responsavel}
           solicitante={solicitante}
-          cargoLabel="Troca de uniforme"
-          itens={itens}
-          observacao="As peças antigas devem ser devolvidas em até 30 dias, conforme controle interno do setor."
+          totalItens={totalItens}
         />
       </div>
-    </>
+
+      <EtiquetaSaco
+        tipo="Troca"
+        nome={nome}
+        re={re}
+        posto={posto}
+        responsavel={responsavel}
+        solicitante={solicitante}
+        cargoLabel="Troca de uniforme"
+        itens={itens}
+        observacao="As peças antigas devem ser devolvidas em até 30 dias, conforme controle interno do setor."
+      />
+    </div>
   );
 }
 
@@ -1232,102 +1164,115 @@ function AbaControleInterno({
     setTimeout(() => {
       window.print();
       setModoImpressao("nenhum");
-    }, 100);
+    }, 150);
   }
 
   return (
-    <>
-      <style jsx global>{`
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 8mm;
-          }
-
-          html,
-          body {
-            background: white !important;
-          }
-
-          body * {
-            visibility: hidden;
-          }
-
-          .print-controle,
-          .print-controle * {
-            visibility: visible !important;
-          }
-
-          .print-controle {
-            display: block !important;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100% !important;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-        }
-      `}</style>
-
-      <div className={modoImpressao === "interno" ? "somente-controle" : ""}>
-        <div className={cardClass()}>
-          <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-slate-900">
-                Controle Interno
-              </h2>
-              <p className="text-sm text-slate-500">
-                Histórico consolidado de admissões e trocas
-              </p>
-            </div>
-
-            <button
-              onClick={imprimirControleInterno}
-              className={buttonPrimary()}
-            >
-              Imprimir folha interna
-            </button>
-          </div>
-
-          <TabelaControleInterno registros={registros} />
-
-          {registros.length > 0 && (
-            <div className="mt-5 space-y-2">
-              <h3 className="font-medium text-slate-900">
-                Remover registro salvo
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {registros.map((registro) => (
-                  <button
-                    key={registro.id}
-                    type="button"
-                    onClick={() => onRemoverRegistro(registro.id)}
-                    className={buttonDangerSoft()}
-                  >
-                    Remover {registro.colaborador || "sem nome"} -{" "}
-                    {registro.data}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <section className="print-controle hidden bg-white">
-          <div className="mb-3 border-b border-black pb-2">
-            <h2 className="text-lg font-bold">CONTROLE INTERNO DE UNIFORMES</h2>
-            <p className="text-xs">
-              Data da impressão: {new Date().toLocaleDateString("pt-BR")}
+    <div className={modoImpressao === "interno" ? "somente-controle" : ""}>
+      <div className={`${cardClass()} no-print`}>
+        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900">
+              Controle Interno
+            </h2>
+            <p className="text-sm text-slate-500">
+              Histórico consolidado de admissões e trocas
             </p>
           </div>
 
-          <ControleInternoPrint registros={registros} />
-        </section>
+          <button
+            onClick={imprimirControleInterno}
+            className={buttonPrimary()}
+          >
+            Imprimir folha interna
+          </button>
+        </div>
+
+        {registros.length === 0 ? (
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center text-sm text-slate-500">
+            Nenhum registro salvo ainda.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {registros.map((registro) => (
+              <div
+                key={registro.id}
+                className="rounded-2xl border border-slate-200 bg-white p-4"
+              >
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-base font-semibold text-slate-900">
+                      {registro.colaborador || "Sem nome"}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      {registro.tipo} • {registro.data}
+                    </p>
+                  </div>
+
+                  <div className="text-sm text-slate-600">
+                    <p>RE: {registro.re || "-"}</p>
+                    <p>Posto: {registro.posto || "-"}</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 text-sm text-slate-700">
+                  <p>
+                    <span className="font-medium">Função:</span>{" "}
+                    {registro.cargo || "-"}
+                  </p>
+                  <p className="mt-1">
+                    <span className="font-medium">Peças:</span>{" "}
+                    {resumirItensInterno(registro.itens)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {registros.length > 0 && (
+          <div className="mt-5 space-y-2">
+            <h3 className="font-medium text-slate-900">Remover registro salvo</h3>
+            <div className="flex flex-wrap gap-2">
+              {registros.map((registro) => (
+                <button
+                  key={registro.id}
+                  type="button"
+                  onClick={() => onRemoverRegistro(registro.id)}
+                  className={buttonDangerSoft()}
+                >
+                  Remover {registro.colaborador || "sem nome"} - {registro.data}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </>
+
+      <section className="print-controle hidden bg-white">
+        <div className="mx-auto w-full max-w-[190mm] text-black">
+          <div className="mb-5 border-b border-black pb-3">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h1 className="text-xl font-bold tracking-wide">
+                  CONTROLE INTERNO DE UNIFORMES
+                </h1>
+                <p className="text-[11px] uppercase tracking-[0.14em] text-slate-600">
+                  Documento para arquivamento em fichário
+                </p>
+              </div>
+
+              <div className="text-right text-[11px]">
+                <p className="font-semibold">Data da impressão</p>
+                <p>{new Date().toLocaleDateString("pt-BR")}</p>
+              </div>
+            </div>
+          </div>
+
+          <ControleInternoPrint registros={registros} />
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -1504,7 +1449,7 @@ function AbaCadastros({
   const funcaoAtual = funcoes.find((f) => f.id === funcaoSelecionada);
 
   return (
-    <div className="grid gap-6 xl:grid-cols-2">
+    <div className="grid gap-6 xl:grid-cols-2 no-print">
       <div className={`${cardClass()} space-y-6`}>
         <div>
           <h2 className="text-xl font-semibold text-slate-900">
@@ -1860,71 +1805,228 @@ export default function Home() {
   ] as const;
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <div className="no-print">
-          <div className="rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shadow-sm">
-            <h1 className="text-3xl font-bold tracking-tight">
-              Controle de Uniformes
-            </h1>
-            <p className="mt-2 text-sm text-slate-200">
-              Gestão de admissões, trocas, impressões, controle interno e
-              cadastros.
-            </p>
+    <>
+      <style jsx global>{`
+        @page {
+          size: A4 portrait;
+          margin: 10mm;
+        }
+
+        @media print {
+          html,
+          body {
+            background: white !important;
+          }
+
+          body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          body * {
+            visibility: hidden;
+          }
+
+          .print-etiqueta,
+          .print-etiqueta *,
+          .print-controle,
+          .print-controle * {
+            visibility: visible !important;
+          }
+
+          .print-etiqueta,
+          .print-controle {
+            display: block !important;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100% !important;
+          }
+
+          .no-print {
+            display: none !important;
+          }
+
+          .print-doc {
+            width: 190mm;
+            margin: 0 auto;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #000;
+          }
+
+          .doc-ficha {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 10mm;
+          }
+        }
+
+        .print-doc {
+          width: 190mm;
+          margin: 0 auto;
+          font-family: Arial, Helvetica, sans-serif;
+          color: #000;
+        }
+
+        .doc-ficha {
+          border: 1px solid #000;
+          padding: 14px;
+          background: #fff;
+        }
+
+        .doc-header {
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 2px solid #000;
+          padding-bottom: 8px;
+          margin-bottom: 12px;
+          gap: 12px;
+        }
+
+        .doc-header-left h2 {
+          font-size: 15px;
+          font-weight: bold;
+          letter-spacing: 0.04em;
+          line-height: 1.25;
+        }
+
+        .doc-subtitle {
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          margin-top: 2px;
+        }
+
+        .doc-header-right {
+          display: flex;
+          gap: 12px;
+          flex-shrink: 0;
+        }
+
+        .doc-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+        }
+
+        .doc-section {
+          margin-top: 10px;
+        }
+
+        .doc-box {
+          border: 1px solid #000;
+          padding: 8px;
+          min-height: 55px;
+          background: #fff;
+        }
+
+        .doc-label {
+          font-size: 9px;
+          font-weight: bold;
+          text-transform: uppercase;
+        }
+
+        .doc-value {
+          font-size: 12px;
+          line-height: 1.4;
+          word-break: break-word;
+        }
+
+        .destaque {
+          font-weight: bold;
+        }
+
+        .doc-signature {
+          margin-top: 26px;
+          text-align: center;
+        }
+
+        .doc-sign-line {
+          width: 70%;
+          height: 60px;
+          border-bottom: 1px solid #000;
+          margin: auto;
+        }
+
+        .doc-signature p {
+          font-size: 11px;
+          margin-top: 6px;
+        }
+
+        .doc-footer {
+          margin-top: 14px;
+          font-size: 9px;
+          text-align: center;
+          opacity: 0.7;
+        }
+      `}</style>
+
+      <main className="min-h-screen bg-slate-50 p-4 md:p-8">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <div className="no-print">
+            <div className="rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shadow-sm">
+              <h1 className="text-3xl font-bold tracking-tight">
+                Controle de Uniformes
+              </h1>
+              <p className="mt-2 text-sm text-slate-200">
+                Gestão de admissões, trocas, impressões, controle interno e
+                cadastros.
+              </p>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-3">
+              {abas.map((item) => (
+                <button
+                  key={item.id}
+                  className={`rounded-2xl px-5 py-2.5 text-sm font-medium transition ${
+                    aba === item.id
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                  }`}
+                  onClick={() => setAba(item.id)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-3">
-            {abas.map((item) => (
-              <button
-                key={item.id}
-                className={`rounded-2xl px-5 py-2.5 text-sm font-medium transition ${
-                  aba === item.id
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
-                }`}
-                onClick={() => setAba(item.id)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
+          {aba === "admissao" && (
+            <AbaAdmissao
+              funcoes={funcoes}
+              catalogo={catalogo}
+              responsaveis={responsaveis}
+              onSalvarRegistro={salvarRegistro}
+            />
+          )}
+
+          {aba === "troca" && (
+            <AbaTroca
+              catalogo={catalogo}
+              responsaveis={responsaveis}
+              onSalvarRegistro={salvarRegistro}
+            />
+          )}
+
+          {aba === "controle" && (
+            <AbaControleInterno
+              registros={registros}
+              onRemoverRegistro={removerRegistro}
+            />
+          )}
+
+          {aba === "cadastros" && (
+            <AbaCadastros
+              catalogo={catalogo}
+              setCatalogo={setCatalogo}
+              responsaveis={responsaveis}
+              setResponsaveis={setResponsaveis}
+              funcoes={funcoes}
+              setFuncoes={setFuncoes}
+            />
+          )}
         </div>
-
-        {aba === "admissao" && (
-          <AbaAdmissao
-            funcoes={funcoes}
-            catalogo={catalogo}
-            responsaveis={responsaveis}
-            onSalvarRegistro={salvarRegistro}
-          />
-        )}
-
-        {aba === "troca" && (
-          <AbaTroca
-            catalogo={catalogo}
-            responsaveis={responsaveis}
-            onSalvarRegistro={salvarRegistro}
-          />
-        )}
-
-        {aba === "controle" && (
-          <AbaControleInterno
-            registros={registros}
-            onRemoverRegistro={removerRegistro}
-          />
-        )}
-
-        {aba === "cadastros" && (
-          <AbaCadastros
-            catalogo={catalogo}
-            setCatalogo={setCatalogo}
-            responsaveis={responsaveis}
-            setResponsaveis={setResponsaveis}
-            funcoes={funcoes}
-            setFuncoes={setFuncoes}
-          />
-        )}
-      </div>
-    </main>
+      </main>
+    </>
   );
-  }
+}
